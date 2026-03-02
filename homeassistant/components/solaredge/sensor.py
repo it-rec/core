@@ -15,6 +15,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import PERCENTAGE, UnitOfEnergy, UnitOfPower
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import (
@@ -244,6 +245,12 @@ async def async_setup_entry(
     for service in sensor_factory.all_services:
         service.async_setup()
         await service.coordinator.async_refresh()
+
+    # Inventory data must be available to detect batteries. If the first
+    # refresh failed, raise ConfigEntryNotReady so HA retries setup — otherwise
+    # the storage service would never be created even after recovery.
+    if not sensor_factory.inventory_service.coordinator.last_update_success:
+        raise ConfigEntryNotReady("Failed to load inventory data")
 
     # After inventory is refreshed, conditionally set up the storage service
     # only if the site has batteries, to avoid unnecessary API polling.

@@ -22,6 +22,9 @@ DETAILS_UPDATE_DELAY = timedelta(hours=12)
 INVENTORY_UPDATE_DELAY = timedelta(hours=12)
 POWER_FLOW_UPDATE_DELAY = timedelta(minutes=15)
 ENERGY_DETAILS_DELAY = timedelta(minutes=15)
+# Storage data endpoint returns full daily telemetry (midnight to now), making
+# each response larger as the day progresses. 4-hour updates are sufficient for
+# daily aggregate battery energy sensors and reduce API rate-limit pressure.
 STORAGE_DATA_UPDATE_DELAY = timedelta(hours=4)
 MODULE_STATISTICS_UPDATE_DELAY = timedelta(hours=12)
 
